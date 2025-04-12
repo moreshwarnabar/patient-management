@@ -1,5 +1,6 @@
 package com.moray.patientservice.service;
 
+import com.moray.patientservice.dto.PatientRequestDTO;
 import com.moray.patientservice.dto.PatientResponseDTO;
 import com.moray.patientservice.mapper.PatientMapper;
 import com.moray.patientservice.model.Patient;
@@ -23,6 +24,13 @@ public class PatientServiceImpl implements PatientService {
 
         return patients.stream()
                 .map(PatientMapper::toDTO).toList();
+    }
+
+    @Override
+    public PatientResponseDTO createPatient(PatientRequestDTO patientRequestDTO) {
+        Patient newPatient = patientRepository.save(PatientMapper.toModel(patientRequestDTO));
+
+        return PatientMapper.toDTO(newPatient);
     }
 
 }
