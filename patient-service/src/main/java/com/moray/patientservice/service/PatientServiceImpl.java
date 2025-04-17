@@ -4,6 +4,7 @@ import com.moray.patientservice.dto.PatientRequestDTO;
 import com.moray.patientservice.dto.PatientResponseDTO;
 import com.moray.patientservice.exception.EmailAlreadyExistsException;
 import com.moray.patientservice.exception.PatientNotFoundException;
+import com.moray.patientservice.grpc.BillingServiceGrpcClient;
 import com.moray.patientservice.mapper.PatientMapper;
 import com.moray.patientservice.model.Patient;
 import com.moray.patientservice.repository.PatientRepository;
@@ -18,8 +19,11 @@ public class PatientServiceImpl implements PatientService {
 
     private final PatientRepository patientRepository;
 
-    public PatientServiceImpl(PatientRepository patientRepository) {
+    private final BillingServiceGrpcClient billingServiceGrpcClient;
+
+    public PatientServiceImpl(PatientRepository patientRepository, BillingServiceGrpcClient billingServiceGrpcClient) {
         this.patientRepository = patientRepository;
+        this.billingServiceGrpcClient = billingServiceGrpcClient;
     }
 
     @Override
@@ -37,6 +41,9 @@ public class PatientServiceImpl implements PatientService {
         }
 
         Patient newPatient = patientRepository.save(PatientMapper.toModel(patientRequestDTO));
+
+        billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(),
+                newPatient.getFirstName(), newPatient.getLastName(), newPatient.getEmail());
 
         return PatientMapper.toDTO(newPatient);
     }
