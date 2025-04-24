@@ -5,6 +5,7 @@ import com.moray.patientservice.dto.PatientResponseDTO;
 import com.moray.patientservice.exception.EmailAlreadyExistsException;
 import com.moray.patientservice.exception.PatientNotFoundException;
 import com.moray.patientservice.grpc.BillingServiceGrpcClient;
+import com.moray.patientservice.kafka.KafkaProducer;
 import com.moray.patientservice.mapper.PatientMapper;
 import com.moray.patientservice.model.Patient;
 import com.moray.patientservice.repository.PatientRepository;
@@ -21,9 +22,12 @@ public class PatientServiceImpl implements PatientService {
 
     private final BillingServiceGrpcClient billingServiceGrpcClient;
 
-    public PatientServiceImpl(PatientRepository patientRepository, BillingServiceGrpcClient billingServiceGrpcClient) {
+    private final KafkaProducer kafkaProducer;
+
+    public PatientServiceImpl(PatientRepository patientRepository, BillingServiceGrpcClient billingServiceGrpcClient, KafkaProducer kafkaProducer) {
         this.patientRepository = patientRepository;
         this.billingServiceGrpcClient = billingServiceGrpcClient;
+        this.kafkaProducer = kafkaProducer;
     }
 
     @Override
@@ -44,6 +48,8 @@ public class PatientServiceImpl implements PatientService {
 
         billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(),
                 newPatient.getFirstName(), newPatient.getLastName(), newPatient.getEmail());
+
+        kafkaProducer.sendEvent(newPatient);
 
         return PatientMapper.toDTO(newPatient);
     }
