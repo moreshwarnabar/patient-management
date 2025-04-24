@@ -3,12 +3,12 @@ POST http://localhost:4000/patients/
 Content-Type: application/json
 
 {
-  "first_name": "Sara",
-  "last_name": "Lance",
-  "date_of_birth": "1987-12-25",
-  "email": "sara@legends.com",
-  "address": "Waverider",
-  "registered_date": "2025-03-19"
+  "first_name": "Moreshwar",
+  "last_name": "Nabar",
+  "date_of_birth": "1996-06-18",
+  "email": "moray@email.com",
+  "address": "Earth",
+  "registered_date": "2024-06-18"
 }
 
 ###
